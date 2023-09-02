@@ -10,11 +10,18 @@ public class PlayerMov : MonoBehaviour
 
 
     #region // Editable in Inspector
+    [Header("XMove")]
     [SerializeField] private float groundSpeed;
+    [SerializeField] float maxXAirSpeed;
+    [SerializeField] float airAcelerateSpeed;
+    [SerializeField] float airDesacelerateSpeed;
+
+    [Header("YMove")]
     [SerializeField] private float maxJumpTime;
     [SerializeField] private float maxYSpeed;
     [SerializeField] AnimationCurve jumpCurve;
     [SerializeField] AnimationCurve fallCurve;
+
     #endregion
 
 
@@ -89,15 +96,57 @@ public class PlayerMov : MonoBehaviour
 
     private float CalcXVelocity()
     {
-       // if (isGround)
-       // {
+        if (isGround)
+        {
             xSpeedNow = GroundXSet();
-        //}
-        //else
-        //{
+        }
+        else
+        {
+            xSpeedNow = NonGroundXSet();
+        }
 
-        //}
-        if(ground.IsGroundEnter()) state = data.idle;
+        return xSpeedNow;
+    }
+
+    private float NonGroundXSet()
+    {
+        xSpeedNow = body.velocity.x;
+
+        //desacelerate if press the two buttons or nothing
+        bool isBothKeyOn = input.left.on && input.right.on;
+        bool isBothKeyOff = !input.left.on && !input.right.on;
+        if (isBothKeyOn || isBothKeyOff)
+        {
+            if (xSpeedNow > 0.1f)
+            {
+                xSpeedNow -= airDesacelerateSpeed;
+            }
+            else if (xSpeedNow < -0.1f)
+            {
+                xSpeedNow += airDesacelerateSpeed;
+            }
+            else
+            {
+                xSpeedNow = 0.0f;
+            }
+        }
+
+        //acelerate
+        else if (input.right.on)
+        {
+            data.isRight = true;
+            xSpeedNow += airAcelerateSpeed;
+        }
+
+        else if (input.left.on)
+        {
+            data.isRight = false;
+            xSpeedNow -= airAcelerateSpeed;
+        }
+
+        //set velocity to not exceed max/min
+        if (Mathf.Abs(xSpeedNow) > maxXAirSpeed)
+            xSpeedNow = Mathf.Sign(xSpeedNow) * maxXAirSpeed;
 
         return xSpeedNow;
     }

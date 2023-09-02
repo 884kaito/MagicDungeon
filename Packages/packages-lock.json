@@ -232,6 +232,12 @@
       },
       "url": "https://packages.unity.com"
     },
+    "jp.amagamina.overwriter": {
+      "version": "file:C:/Users/kaito/Downloads/unity-overwriter-master/unity-overwriter-master",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
