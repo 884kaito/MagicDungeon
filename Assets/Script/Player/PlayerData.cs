@@ -25,6 +25,10 @@ public class PlayerData : MonoBehaviour
 
     void Start()
     {
-        
+
+    }
+    private void Update()
+    {
+
     }
 }

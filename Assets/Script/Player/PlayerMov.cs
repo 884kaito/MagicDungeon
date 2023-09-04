@@ -49,7 +49,7 @@ public class PlayerMov : MonoBehaviour
     void Start()
     {
         data = GetComponent<PlayerData>();
-        state = data.state;
+        state = data.state; //to abbreviate
         body = GetComponent<Rigidbody>();
         input = GetComponent<CheckInput>();
     }
@@ -60,6 +60,8 @@ public class PlayerMov : MonoBehaviour
 
         //calculate velocity
         SetVelocity();
+
+        data.state = state;
     }
 
     #region //CheckGroundCollisions
@@ -83,7 +85,7 @@ public class PlayerMov : MonoBehaviour
     {
         xSpeedNow = body.velocity.x;
         ySpeedNow = body.velocity.y;
-
+        
         CalcXVelocity();
         CalcYVelocity();
 
@@ -96,7 +98,7 @@ public class PlayerMov : MonoBehaviour
 
     private float CalcXVelocity()
     {
-        if (isGround)
+        if (state == data.idle || state == data.run)
         {
             xSpeedNow = GroundXSet();
         }
@@ -104,6 +106,33 @@ public class PlayerMov : MonoBehaviour
         {
             xSpeedNow = NonGroundXSet();
         }
+
+        return xSpeedNow;
+    }
+
+    private float GroundXSet()
+    {
+        state = data.idle;
+
+        bool isBothKeyOn = input.left.on && input.right.on;
+        if (isBothKeyOn)
+            xSpeedNow = 0.0f;
+
+        else if (input.right.on)
+        {
+            data.isRight = true;
+            xSpeedNow = groundSpeed;
+            state = data.run;
+        }
+
+        else if (input.left.on)
+        {
+            data.isRight = false;
+            xSpeedNow = -groundSpeed;
+            state = data.run;
+        }
+        else
+            xSpeedNow = 0.0f;
 
         return xSpeedNow;
     }
@@ -151,30 +180,6 @@ public class PlayerMov : MonoBehaviour
         return xSpeedNow;
     }
 
-
-    private float GroundXSet()
-    {
-        bool isBothKeyOn = input.left.on && input.right.on;
-        if (isBothKeyOn)
-            xSpeedNow = 0.0f;
-
-        else if (input.right.on)
-        {
-            data.isRight = true;
-            xSpeedNow = groundSpeed;
-        }
-
-        else if (input.left.on)
-        {
-            data.isRight = false;
-            xSpeedNow = -groundSpeed;
-        }
-        else
-            xSpeedNow = 0.0f;
-
-        return xSpeedNow;
-    }
-
     #endregion
 
 
@@ -187,7 +192,6 @@ public class PlayerMov : MonoBehaviour
         {
             state = data.jump;
             ResetYData();
-            Debug.Log("jump");
         }
 
         //execute jump
@@ -199,7 +203,6 @@ public class PlayerMov : MonoBehaviour
                 state = data.fall;
                 ResetYData();
             }
-            Debug.Log("jumping");
 
             //execute jump
             jumpTime += Time.deltaTime;
