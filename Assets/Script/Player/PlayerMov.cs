@@ -8,7 +8,6 @@ public class PlayerMov : MonoBehaviour
     /// Variable
     ///////////////
 
-
     #region // Editable in Inspector
     [Header("XMove")]
     [SerializeField] private float groundSpeed;
@@ -22,12 +21,17 @@ public class PlayerMov : MonoBehaviour
     [SerializeField] AnimationCurve jumpCurve;
     [SerializeField] AnimationCurve fallCurve;
 
+    [Header("AirMagic")]
+    [SerializeField] private float airMagicDesalloc; //air Magic deallocation
+    [SerializeField] private float airMagicMp;
     #endregion
 
 
     #region //editable in other scripts
+
     //move bools
     [HideInInspector] public bool isGround = false;
+
     #endregion
 
 
@@ -40,7 +44,15 @@ public class PlayerMov : MonoBehaviour
     [Header("Player Components")]
     [SerializeField] private GroundCheck ground;
     [SerializeField] private GroundCheck head;
+
+    [Header("Extern Components")]
+    [SerializeField] private GameObject airMagicPrehub;
     #endregion
+
+
+
+
+
 
     ///////////////
     /// Script
@@ -61,8 +73,14 @@ public class PlayerMov : MonoBehaviour
         //calculate velocity
         SetVelocity();
 
+        AirMagic();
+
         data.state = state;
     }
+
+
+
+
 
     #region //CheckGroundCollisions
 
@@ -76,6 +94,8 @@ public class PlayerMov : MonoBehaviour
     #endregion
 
 
+
+
     #region //SetVelocity
 
 
@@ -83,6 +103,12 @@ public class PlayerMov : MonoBehaviour
     private float ySpeedNow;
     private void SetVelocity()
     {
+        if (state == data.airMagic)
+        {
+            StopPlayer();
+            return;
+        }
+
         xSpeedNow = body.velocity.x;
         ySpeedNow = body.velocity.y;
         
@@ -183,6 +209,8 @@ public class PlayerMov : MonoBehaviour
     #endregion
 
 
+    #region//YVelocity
+
     private float jumpTime = 0f;
     private float fallTime = 0f;
     private float CalcYVelocity()
@@ -238,13 +266,74 @@ public class PlayerMov : MonoBehaviour
         fallTime = 0f;
     }
 
-    //
     public void StopPlayer()
     {
         body.velocity = new Vector2(0, 0);
     }
 
+    #endregion
 
     #endregion
 
+
+
+
+    #region//AirMagic
+    private 
+
+    void AirMagic()
+    {
+        if (input.airMagic.down && !isGround && state != data.airMagic)
+        {
+            StartAirMagic();
+            return;
+        }
+
+        if (input.up.down && !isGround && state != data.airMagic)
+        {
+            StartAirMagic();
+            StopAirMagic();
+            return;
+        }
+
+        if (state == data.airMagic && (input.airMagic.down || input.up.down))
+        {
+            StopAirMagic();
+        }
+
+            
+    }
+
+    void StartAirMagic()
+    {
+        bool canShoot = data.UseMp(airMagicMp);
+        if (!canShoot) return;
+
+        state = data.airMagic;
+        StopPlayer();
+
+        GameObject airMagic = Instantiate(airMagicPrehub);
+        airMagic.transform.position = this.transform.position;
+        airMagic.transform.position += new Vector3(0, -airMagicDesalloc, 0);
+        airMagic.SetActive(true);
+    }
+
+    void StopAirMagic()
+    {
+        if (input.up.down)
+        {
+            state = data.jump;
+
+            //set x velocity
+            float direction = 0;
+            if (input.right.on) direction += 1;
+            if (input.left.on) direction -= 1;
+            body.velocity = new Vector2(direction * maxXAirSpeed, body.velocity.y);
+        }   
+        if (input.airMagic.down)
+            state = data.fall;
+        ResetYData();
+    }
+
+    #endregion
 }

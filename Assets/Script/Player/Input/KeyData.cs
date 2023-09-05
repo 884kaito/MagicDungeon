@@ -20,5 +20,5 @@ public class KeyData : MonoBehaviour
         on = false;
         down = false;
         before = false;
-}
+    }
 }

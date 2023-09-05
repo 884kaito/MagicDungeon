@@ -4,6 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// Check inputs linked with fixedUpdate time
+/// Can configure only keyboard keys through inspector
 /// </summary>
 public class CheckInput : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class CheckInput : MonoBehaviour
     [SerializeField] private string leftKey;
     [SerializeField] private string upKey;
     [SerializeField] private string downKey;
-    [SerializeField] private string changeKey;
+    [SerializeField] private string airMagicKey;
     [SerializeField] private string healKey;
     [SerializeField] private string dashKey;
     [SerializeField] private string basicAttackKey;
@@ -25,14 +26,18 @@ public class CheckInput : MonoBehaviour
     [HideInInspector] public KeyData up;
     [HideInInspector] public KeyData right;
     [HideInInspector] public KeyData left;
-    [HideInInspector] public KeyData change;
+    [HideInInspector] public KeyData airMagic;
     [HideInInspector] public KeyData heal;
     [HideInInspector] public KeyData dash;
     [HideInInspector] public KeyData basicAttack;
-
+    
+    [HideInInspector] public KeyData attack;
+    [HideInInspector] public KeyData teleport;
 
     //local variable
     private KeyData[] keys;
+    private KeyData[] buttons;
+    private int buttonNumber = 2;
 
 
 
@@ -41,7 +46,7 @@ public class CheckInput : MonoBehaviour
 
     private void Start()
     {
-        //inicialize keys
+        //inicialize keys and buttons
 
         keys = new KeyData[keyNumber];
 
@@ -49,19 +54,28 @@ public class CheckInput : MonoBehaviour
         right = new KeyData();
         up = new KeyData();
         left = new KeyData();
-        change = new KeyData();
+        airMagic = new KeyData();
         heal = new KeyData();
         dash = new KeyData();
         basicAttack = new KeyData();
+
+        buttons = new KeyData[buttonNumber];
+
+        attack = new KeyData();
+        teleport = new KeyData();
         
+
         keys[0] = down;
         keys[1] = left;
         keys[2] = right;
         keys[3] = up;
-        keys[4] = change;
+        keys[4] = airMagic;
         keys[5] = heal;
         keys[6] = dash;
         keys[7] = basicAttack;
+
+        buttons[0] = attack;
+        buttons[1] = teleport;
 
         SetKeyNames();
     }
@@ -85,7 +99,7 @@ public class CheckInput : MonoBehaviour
         up.code = upKey;
         right.code = rightKey;
         left.code = leftKey;
-        change.code = changeKey;
+        airMagic.code = airMagicKey;
         heal.code = healKey;
         dash.code = dashKey;
         basicAttack.code = basicAttackKey;
@@ -110,12 +124,14 @@ public class CheckInput : MonoBehaviour
             keys[i].down = false;
             keys[i].on = false;
         }
+
+        for (int i = 0; i < buttonNumber; i++)
+        {
+            buttons[i].down = false;
+            buttons[i].on = false;
+        }
     }
 
-
-
-    bool rightBottonNow;
-    bool beforeRightBotton = false;
 
     //atualiza os variaveis dos keys
     private void VerifityKey()
@@ -134,6 +150,21 @@ public class CheckInput : MonoBehaviour
             }
             keys[i].on = keys[i].on || keys[i].down;
         }
+
+        //mouse button
+        for (int i = 0; i < buttonNumber; i++)
+        {
+            bool buttonNow = Input.GetMouseButton(i) || Input.GetMouseButtonDown(i);
+            if (buttonNow && buttons[i].before)
+            {
+                buttons[i].on = true;
+            }
+            else if (buttonNow && !buttons[i].before)
+            {
+                buttons[i].down = true;
+            }
+            buttons[i].on = buttons[i].on || buttons[i].down;
+        }
     }
 
 
@@ -146,8 +177,11 @@ public class CheckInput : MonoBehaviour
             keys[i].before = keys[i].on;
         }
 
-        beforeRightBotton = rightBottonNow;
-
+        //mouse button
+        for (int i = 0; i < buttonNumber; i++)
+        {
+            buttons[i].before = buttons[i].on;
+        }
     }
 
     #endregion
