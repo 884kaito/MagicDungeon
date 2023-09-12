@@ -16,8 +16,8 @@ public class PlayerMov : MonoBehaviour
     [SerializeField] float airDesacelerateSpeed;
 
     [Header("YMove")]
-    [SerializeField] private float maxJumpTime;
-    [SerializeField] private float maxYSpeed;
+    public float maxJumpTime;
+    [SerializeField] float maxYSpeed;
     [SerializeField] AnimationCurve jumpCurve;
     [SerializeField] AnimationCurve fallCurve;
 
@@ -29,8 +29,11 @@ public class PlayerMov : MonoBehaviour
 
     #region //editable in other scripts
 
-    //move bools
+    //move
     [HideInInspector] public bool isGround = false;
+    [HideInInspector] public float jumpTime = 0f;
+    [HideInInspector] public float fallTime = 0f;
+    [HideInInspector] public float xSpeedNow;
 
     #endregion
 
@@ -98,9 +101,7 @@ public class PlayerMov : MonoBehaviour
 
     #region //SetVelocity
 
-
-    private float xSpeedNow;
-    private float ySpeedNow;
+    float ySpeedNow;
     private void SetVelocity()
     {
         if (state == data.airMagic)
@@ -211,8 +212,6 @@ public class PlayerMov : MonoBehaviour
 
     #region//YVelocity
 
-    private float jumpTime = 0f;
-    private float fallTime = 0f;
     private float CalcYVelocity()
     {
         //start jump
@@ -291,8 +290,8 @@ public class PlayerMov : MonoBehaviour
 
         if (input.up.down && !isGround && state != data.airMagic)
         {
-            StartAirMagic();
-            StopAirMagic();
+            if(StartAirMagic())
+                StopAirMagic();
             return;
         }
 
@@ -304,10 +303,10 @@ public class PlayerMov : MonoBehaviour
             
     }
 
-    void StartAirMagic()
+    bool StartAirMagic()
     {
         bool canShoot = data.UseMp(airMagicMp);
-        if (!canShoot) return;
+        if (!canShoot) return false;
 
         state = data.airMagic;
         StopPlayer();
@@ -316,6 +315,8 @@ public class PlayerMov : MonoBehaviour
         airMagic.transform.position = this.transform.position;
         airMagic.transform.position += new Vector3(0, -airMagicDesalloc, 0);
         airMagic.SetActive(true);
+
+        return true;
     }
 
     void StopAirMagic()
