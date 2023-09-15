@@ -86,9 +86,7 @@ public class PlayerAnime : MonoBehaviour
             if (animeInfo.clip.name != fall)
                 anime.Play(fall);
         }
-
-        Debug.Log(animeInfo.clip.name);
-        
+    
     }
 
     #endregion

@@ -16,6 +16,7 @@ public class PlayerMov : MonoBehaviour
     [SerializeField] float airDesacelerateSpeed;
 
     [Header("YMove")]
+    [SerializeField] private float groundYSpeed;
     public float maxJumpTime;
     [SerializeField] float maxYSpeed;
     [SerializeField] AnimationCurve jumpCurve;
@@ -39,14 +40,14 @@ public class PlayerMov : MonoBehaviour
 
 
     #region //extern components
+    [Header("Player Components")]
     private PlayerData data;
     private PlayerData.State state;
     private Rigidbody body;
     private CheckInput input;
-
-    [Header("Player Components")]
     [SerializeField] private GroundCheck ground;
     [SerializeField] private GroundCheck head;
+    [SerializeField] private GroundCheck pCol;
 
     [Header("Extern Components")]
     [SerializeField] private GameObject airMagicPrehub;
@@ -88,10 +89,13 @@ public class PlayerMov : MonoBehaviour
     #region //CheckGroundCollisions
 
     private bool isHead = false;
+    private bool groundCollide = false;
     public void CheckGroundCollisions()
     {
         isGround = ground.IsGround();
         isHead = head.IsGround();
+        groundCollide = pCol.IsGround();
+        Debug.Log(groundCollide);
     }
 
     #endregion
@@ -109,13 +113,14 @@ public class PlayerMov : MonoBehaviour
             StopPlayer();
             return;
         }
-
+        Debug.Log("body.velocity1 " + body.velocity);
         xSpeedNow = body.velocity.x;
         ySpeedNow = body.velocity.y;
         
         CalcXVelocity();
         CalcYVelocity();
-
+        Debug.Log("ySpeed " + ySpeedNow);
+        Debug.Log("body.velocity2 " + body.velocity);
         body.velocity = new Vector2(xSpeedNow, ySpeedNow);
     }
 
@@ -214,6 +219,10 @@ public class PlayerMov : MonoBehaviour
 
     private float CalcYVelocity()
     {
+        //if is on the ground 
+        if (isGround && !groundCollide) ySpeedNow = -groundYSpeed;
+        else ySpeedNow = 0;
+
         //start jump
         if (input.up.down && isGround && state != data.jump)
         {
@@ -252,10 +261,12 @@ public class PlayerMov : MonoBehaviour
             }
             else
             {
+                Debug.Log(fallTime);
                 fallTime += Time.deltaTime;
                 ySpeedNow = -maxYSpeed * fallCurve.Evaluate(fallTime / maxJumpTime);
             }
         }
+
         return ySpeedNow;
     }
 
