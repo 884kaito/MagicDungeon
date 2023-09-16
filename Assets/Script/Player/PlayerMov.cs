@@ -95,7 +95,6 @@ public class PlayerMov : MonoBehaviour
         isGround = ground.IsGround();
         isHead = head.IsGround();
         groundCollide = pCol.IsGround();
-        Debug.Log(groundCollide);
     }
 
     #endregion
@@ -113,14 +112,13 @@ public class PlayerMov : MonoBehaviour
             StopPlayer();
             return;
         }
-        Debug.Log("body.velocity1 " + body.velocity);
+
         xSpeedNow = body.velocity.x;
         ySpeedNow = body.velocity.y;
         
         CalcXVelocity();
         CalcYVelocity();
-        Debug.Log("ySpeed " + ySpeedNow);
-        Debug.Log("body.velocity2 " + body.velocity);
+
         body.velocity = new Vector2(xSpeedNow, ySpeedNow);
     }
 
@@ -261,7 +259,6 @@ public class PlayerMov : MonoBehaviour
             }
             else
             {
-                Debug.Log(fallTime);
                 fallTime += Time.deltaTime;
                 ySpeedNow = -maxYSpeed * fallCurve.Evaluate(fallTime / maxJumpTime);
             }
