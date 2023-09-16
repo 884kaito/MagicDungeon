@@ -64,6 +64,9 @@ public class NEnemyMov : MonoBehaviour
 
     void Move()
     {
+        //dead
+        if (state == die) return;
+
         //flip
         if (front.IsGround() || !ground.IsGround())
         {
@@ -79,11 +82,10 @@ public class NEnemyMov : MonoBehaviour
         {
             state = State.Fright;
         }
-
+        
         //stop Fright
         if (!battleArea.IsHit() && state == fright)
         {
-            Debug.Log("stop Fright");
             state = State.Search;
         }
 
@@ -140,7 +142,7 @@ public class NEnemyMov : MonoBehaviour
             //search finish, change to move
             if (animeInfo.clip.name == searchAnim && anime.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
             {
-                Debug.Log("start move"); state = State.Move; ;
+                state = State.Move;
             }
                 
 
