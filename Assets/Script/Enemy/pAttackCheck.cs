@@ -2,14 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TagCheck : MonoBehaviour
+public class pAttackCheck : MonoBehaviour
 {
-    [SerializeField] private string checkTag;
+    private string checkTag;
     private bool isHit = false;
     private bool isEnter, isStay, isExit;
 
-    [HideInInspector] public Collider col;
-    [HideInInspector] public bool IsHit()
+    [HideInInspector] public AttackData.Data hitData;
+
+
+
+    private void Start()
+    {
+        checkTag = GameManager.inst.pAttackTag;
+    }
+
+    public bool IsHit()
     {
         if (isEnter || isStay)
         {
@@ -20,29 +28,44 @@ public class TagCheck : MonoBehaviour
             isHit = false;
         }
 
-        isEnter = false;
-        isStay = false;
-        isExit = false;
+        ResetValue();
         return isHit;
     }
 
-    [HideInInspector] public bool IsEnter()
+    
+    public bool IsEnter()
     {
-        return isEnter;
+        bool returnValue = isEnter;
+        ResetValue();
+
+        return returnValue;
     }
 
-    [HideInInspector] public bool IsExit()
+    public bool IsExit()
     {
-        return isExit;
+        bool returnValue = isExit;
+        ResetValue();
+
+        return returnValue;
     }
-    
+
+    private void ResetValue()
+    {
+        isEnter = false;
+        isStay = false;
+        isExit = false;
+    }
+
 
     private void OnTriggerEnter(Collider collision)
     {
         if (collision.CompareTag(checkTag))
         {
             isEnter = true;
-            col = collision;
+            if(collision.GetComponent<AttackData>())
+                hitData = collision.GetComponent<AttackData>().data;
+            else
+                Debug.LogError("Hit object dont have AttackData script");
         }
     }
 

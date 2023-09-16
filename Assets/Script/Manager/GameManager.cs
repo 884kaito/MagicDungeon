@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public string terrainTag = "Ground";
     [HideInInspector] public string playerTag = "Player";
     [HideInInspector] public string enemyTag = "Enemy";
+    [HideInInspector] public string pAttackTag = "PlayerAttack";
 
 
     public static GameManager inst = null;

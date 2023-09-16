@@ -26,14 +26,19 @@ public class NEnemyMov : MonoBehaviour
 
 
 
-    enum State
+    [HideInInspector] public enum State
     {
         Move,
         Fright,
         Search,
         Die
     }
-    State state = State.Move;
+    [HideInInspector] public State state = State.Move;
+    [HideInInspector] public State move = State.Move;
+    [HideInInspector] public State fright = State.Fright;
+    [HideInInspector] public State search = State.Search;
+    [HideInInspector] public State die = State.Die;
+
     AnimatorClipInfo animeInfo;
 
 
@@ -66,18 +71,23 @@ public class NEnemyMov : MonoBehaviour
             transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
         }
 
+
+
         //start Fright
-        if ((searchArea.IsHit() && (state == State.Move || state == State.Search))
-             || (battleArea.IsHit() && state == State.Search))
+        if ((searchArea.IsHit() && (state == move || state == search))
+             || (battleArea.IsHit() && state == search))
         {
             state = State.Fright;
         }
 
         //stop Fright
-        if (!battleArea.IsHit() && state == State.Fright)
+        if (!battleArea.IsHit() && state == fright)
         {
+            Debug.Log("stop Fright");
             state = State.Search;
         }
+
+
 
 
         //set velocity in normal mode
@@ -89,15 +99,16 @@ public class NEnemyMov : MonoBehaviour
                 body.velocity = new Vector2(xSpeed, -gravity);
             else
                 body.velocity = new Vector2(0, 0);
-
-
         }
 
-        //set velocity in attack mode
-        if (state == State.Fright)
+        //set velocity in fright mode
+        if (state == fright)
         {
             body.velocity = new Vector2(0, 0);
         }
+
+
+
 
     }
 
@@ -128,10 +139,14 @@ public class NEnemyMov : MonoBehaviour
         {
             //search finish, change to move
             if (animeInfo.clip.name == searchAnim && anime.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
-                state = State.Move;
+            {
+                Debug.Log("start move"); state = State.Move; ;
+            }
+                
 
             if (animeInfo.clip.name != searchAnim)
                 anime.Play(searchAnim);
         }
     }
+
 }

@@ -19,28 +19,44 @@ public class Fire : MonoBehaviour
     }
 
 
+
+
     void FixedUpdate()
     {
-        //if exceed max time, destroy
-        if (timer >= maxTime)
-            Destroy(this.gameObject);
-
-        timer += Time.deltaTime;
+        CountTime();
     }
+
+
 
     //if hit terrain or enemy, destroy
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag(GameManager.inst.enemyTag) || other.gameObject.CompareTag(GameManager.inst.terrainTag))
         {
-            Destroy(this.gameObject);
+            DestroyMagic();
         }
     }
     private void OnTriggerStay(Collider other)
     {
         if(other.gameObject.CompareTag(GameManager.inst.enemyTag) || other.gameObject.CompareTag(GameManager.inst.terrainTag))
         {
-            Destroy(this.gameObject);
+            DestroyMagic();
         }
+    }
+
+
+    void CountTime()
+    {
+        //if exceed max time, destroy
+        if (timer >= maxTime)
+            DestroyMagic();
+
+        timer += Time.deltaTime;
+    }
+
+
+    void DestroyMagic()
+    {
+        Destroy(this.gameObject);
     }
 }
