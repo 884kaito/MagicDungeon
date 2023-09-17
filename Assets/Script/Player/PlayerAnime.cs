@@ -41,6 +41,7 @@ public class PlayerAnime : MonoBehaviour
     readonly string jump = "Jump";
     readonly string fall = "Fall";
     readonly string land = "Land";
+    readonly string hit = "Hit";
 
     //animation variables
     readonly string jumpFallTime = "jumpFallTime";
@@ -86,7 +87,13 @@ public class PlayerAnime : MonoBehaviour
             if (animeInfo.clip.name != fall)
                 anime.Play(fall);
         }
-    
+
+        //hit
+        if (state == data.hit && animeInfo.clip.name != hit)
+            anime.Play(hit);
+
+
+
     }
 
     #endregion

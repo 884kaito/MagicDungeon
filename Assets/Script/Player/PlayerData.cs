@@ -21,12 +21,17 @@ public class PlayerData : MonoBehaviour
 
     //player state
     [HideInInspector] public bool isRight = true;
+    [HideInInspector] public bool canHit = true;
+    [HideInInspector] public bool canControl = true;
+
     public enum State {
         Idle,
         Run,
         Jump,
         Fall,
-        AirMagic
+        AirMagic,
+        Hit,
+        Die
     };
     [HideInInspector] public State state = State.Idle;
     [HideInInspector] public State idle = State.Idle;
@@ -34,6 +39,8 @@ public class PlayerData : MonoBehaviour
     [HideInInspector] public State jump = State.Jump;
     [HideInInspector] public State fall = State.Fall;
     [HideInInspector] public State airMagic = State.AirMagic;
+    [HideInInspector] public State hit = State.Hit;
+    [HideInInspector] public State die = State.Die;
 
     //hp & mp
     [HideInInspector] public float hp;
@@ -65,11 +72,6 @@ public class PlayerData : MonoBehaviour
 
     #region //Mp
 
-    /// <summary>
-    /// use Mp
-    /// </summary>
-    /// <param name="useMp"></param>
-    /// <returns>return if have mp enough</returns>
     public bool UseMp(float useMp)
     {
         //if not have mp enough, cant use mp
@@ -88,5 +90,23 @@ public class PlayerData : MonoBehaviour
         if (mpHealTimer >= mpHealCooldown && mp < maxMp)
             mp += Time.deltaTime * maxMp * mpHealSpeed; 
     }
+    #endregion
+
+
+
+
+
+    #region //Hp
+
+    public bool MinusHp(float damage)
+    {
+        //if not have hp enough, die
+        if (hp - damage <= 0)
+            return false;
+
+        hp -= damage;
+        return true;
+    }
+
     #endregion
 }

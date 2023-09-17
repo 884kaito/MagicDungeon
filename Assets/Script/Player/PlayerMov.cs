@@ -42,7 +42,6 @@ public class PlayerMov : MonoBehaviour
     #region //extern components
     [Header("Player Components")]
     private PlayerData data;
-    private PlayerData.State state;
     private Rigidbody body;
     private CheckInput input;
     [SerializeField] private GroundCheck ground;
@@ -65,7 +64,6 @@ public class PlayerMov : MonoBehaviour
     void Start()
     {
         data = GetComponent<PlayerData>();
-        state = data.state; //to abbreviate
         body = GetComponent<Rigidbody>();
         input = GetComponent<CheckInput>();
     }
@@ -74,12 +72,13 @@ public class PlayerMov : MonoBehaviour
     {
         CheckGroundCollisions();
 
+        if (!data.canControl)
+            return;
+
         //calculate velocity
         SetVelocity();
 
         AirMagic();
-
-        data.state = state;
     }
 
 
@@ -107,7 +106,7 @@ public class PlayerMov : MonoBehaviour
     float ySpeedNow;
     private void SetVelocity()
     {
-        if (state == data.airMagic)
+        if (data.state == data.airMagic)
         {
             StopPlayer();
             return;
@@ -128,7 +127,7 @@ public class PlayerMov : MonoBehaviour
 
     private float CalcXVelocity()
     {
-        if (state == data.idle || state == data.run)
+        if (data.state == data.idle || data.state == data.run)
         {
             xSpeedNow = GroundXSet();
         }
@@ -142,7 +141,7 @@ public class PlayerMov : MonoBehaviour
 
     private float GroundXSet()
     {
-        state = data.idle;
+        data.state = data.idle;
 
         bool isBothKeyOn = input.left.on && input.right.on;
         if (isBothKeyOn)
@@ -152,14 +151,14 @@ public class PlayerMov : MonoBehaviour
         {
             data.isRight = true;
             xSpeedNow = groundSpeed;
-            state = data.run;
+            data.state = data.run;
         }
 
         else if (input.left.on)
         {
             data.isRight = false;
             xSpeedNow = -groundSpeed;
-            state = data.run;
+            data.state = data.run;
         }
         else
             xSpeedNow = 0.0f;
@@ -222,19 +221,19 @@ public class PlayerMov : MonoBehaviour
         else ySpeedNow = 0;
 
         //start jump
-        if (input.up.down && isGround && state != data.jump)
+        if (input.up.down && isGround && data.state != data.jump)
         {
-            state = data.jump;
+            data.state = data.jump;
             ResetYData();
         }
 
         //execute jump
-        if (state == data.jump)
+        if (data.state == data.jump)
         {
             //stop jump
             if (jumpTime >= maxJumpTime || ground.IsGroundEnter() || isHead)
             {
-                state = data.fall;
+                data.state = data.fall;
                 ResetYData();
             }
 
@@ -244,18 +243,18 @@ public class PlayerMov : MonoBehaviour
         }
 
         //start fall
-        if (!isGround && state != data.jump && state != data.fall)
+        if (!isGround && data.state != data.jump && data.state != data.fall)
         {
-            state = data.fall;
+            data.state = data.fall;
             ResetYData();
         }
 
         //execute fall
-        if (state == data.fall)
+        if (data.state == data.fall)
         {
             if (isGround)
             {
-                state = data.idle;
+                data.state = data.idle;
             }
             else
             {
@@ -290,20 +289,20 @@ public class PlayerMov : MonoBehaviour
 
     void AirMagic()
     {
-        if (input.airMagic.down && !isGround && state != data.airMagic)
+        if (input.airMagic.down && !isGround && data.state != data.airMagic)
         {
             StartAirMagic();
             return;
         }
 
-        if (input.up.down && !isGround && state != data.airMagic)
+        if (input.up.down && !isGround && data.state != data.airMagic)
         {
             if(StartAirMagic())
                 StopAirMagic();
             return;
         }
 
-        if (state == data.airMagic && (input.airMagic.down || input.up.down))
+        if (data.state == data.airMagic && (input.airMagic.down || input.up.down))
         {
             StopAirMagic();
         }
@@ -316,7 +315,7 @@ public class PlayerMov : MonoBehaviour
         bool canShoot = data.UseMp(airMagicMp);
         if (!canShoot) return false;
 
-        state = data.airMagic;
+        data.state = data.airMagic;
         StopPlayer();
 
         GameObject airMagic = Instantiate(airMagicPrehub);
@@ -331,7 +330,7 @@ public class PlayerMov : MonoBehaviour
     {
         if (input.up.down)
         {
-            state = data.jump;
+            data.state = data.jump;
 
             //set x velocity
             float direction = 0;
@@ -340,7 +339,7 @@ public class PlayerMov : MonoBehaviour
             body.velocity = new Vector2(direction * maxXAirSpeed, body.velocity.y);
         }   
         if (input.airMagic.down)
-            state = data.fall;
+            data.state = data.fall;
         ResetYData();
     }
 

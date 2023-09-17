@@ -1,15 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class EnemyHp : MonoBehaviour
 {
+    [Header("Hit")]
     [SerializeField] float maxHp;
+    [SerializeField] Collider hitArea;
     [SerializeField] pAttackCheck pAttack;
+
+    [Header("Death")]
     [SerializeField] float deathTime;
     [SerializeField] float uncolorTime;
     [SerializeField] Material deathMaterial;
     [SerializeField] GameObject deathParticlePrehub;
+
+    [Header("Damage Text")]
+    [SerializeField] GameObject damageTextCanvas;
+    [SerializeField] Vector3 damageTextOffset;
+    [SerializeField] Vector3 damageTextRand;
 
 
     NEnemyMov mov;
@@ -39,11 +50,6 @@ public class EnemyHp : MonoBehaviour
             normalColors[i] = renderers[i].material.color;
     }
 
-    void Update()
-    {
-
-    }
-
 
     void FixedUpdate()
     {
@@ -64,6 +70,9 @@ public class EnemyHp : MonoBehaviour
 
     void Hit(AttackData.Data data)
     {
+        if(mov.state != mov.die)
+            CreateDamageText(data.damage);
+
         if (MinusHp(data.damage))
         {
             mov.state = mov.fright;
@@ -87,20 +96,38 @@ public class EnemyHp : MonoBehaviour
     }
 
 
-    [SerializeField] float wait;
-    [SerializeField] float mult;
     IEnumerator HitAnime()
     {
-        for (int i = 0; i < renderers.Length; i++)
-            renderers[i].material.color = new Color(normalColors[i].r * mult,
-                                            normalColors[i].g * mult,
-                                            normalColors[i].b * mult);
+        float colorMult = 0.7f;
 
-        yield return new WaitForSeconds(wait);
+        for (int i = 0; i < renderers.Length; i++)
+            renderers[i].material.color = new Color(normalColors[i].r * colorMult,
+                                            normalColors[i].g * colorMult,
+                                            normalColors[i].b * colorMult);
+
+        yield return new WaitForSeconds(0.1f);
 
         for (int i = 0; i < renderers.Length; i++)
             renderers[i].material.color = normalColors[i];
     }
+
+
+    void CreateDamageText(float damage)
+    {
+        //create
+        GameObject canvas = Instantiate(damageTextCanvas);
+        TMP_Text damageText = canvas.GetComponentInChildren<TMP_Text>();
+
+        //set text and inicial position
+        damageText.text = damage.ToString();
+        Vector3 rand = new Vector3(Random.Range(-damageTextRand.x, damageTextRand.x), 
+                        Random.Range(-damageTextRand.y, damageTextRand.y),
+                        Random.Range(-damageTextRand.z, damageTextRand.z));
+        damageText.transform.position += rand;
+        damageText.transform.position += damageTextOffset;
+        damageText.transform.position += this.transform.position;
+    }
+
 
 
     float timer = 0;
@@ -108,6 +135,9 @@ public class EnemyHp : MonoBehaviour
     {
         //update state
         mov.state = mov.die;
+
+        //disable hit collider
+        hitArea.enabled = false;
 
         //stop enemy
         body.velocity = new Vector2(0, 0);
