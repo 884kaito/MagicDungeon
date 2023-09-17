@@ -7,16 +7,17 @@ public class EnemyHp : MonoBehaviour
     [SerializeField] float maxHp;
     [SerializeField] pAttackCheck pAttack;
     [SerializeField] float deathTime;
+    [SerializeField] float uncolorTime;
     [SerializeField] Material deathMaterial;
+    [SerializeField] GameObject deathParticlePrehub;
 
 
     NEnemyMov mov;
-    NEnemyMov.State state;
     Animator anime;
     Rigidbody body;
     Renderer[] renderers;
     Color[] normalColors;
-
+    
 
     float hp;
     
@@ -51,7 +52,7 @@ public class EnemyHp : MonoBehaviour
 
 
         //execute die
-        if(state == mov.die)
+        if(mov.state == mov.die)
         {
             ExecuteDieAnim();
         }
@@ -63,7 +64,12 @@ public class EnemyHp : MonoBehaviour
 
     void Hit(AttackData.Data data)
     {
-        if (!MinusHp(data.damage))
+        if (MinusHp(data.damage))
+        {
+            mov.state = mov.fright;
+            StartCoroutine(HitAnime());
+        }
+        else
         {
             StartCoroutine(Death());
         }
@@ -81,35 +87,57 @@ public class EnemyHp : MonoBehaviour
     }
 
 
+    [SerializeField] float wait;
+    [SerializeField] float mult;
+    IEnumerator HitAnime()
+    {
+        for (int i = 0; i < renderers.Length; i++)
+            renderers[i].material.color = new Color(normalColors[i].r * mult,
+                                            normalColors[i].g * mult,
+                                            normalColors[i].b * mult);
+
+        yield return new WaitForSeconds(wait);
+
+        for (int i = 0; i < renderers.Length; i++)
+            renderers[i].material.color = normalColors[i];
+    }
 
 
-
-    readonly string deathAnim = "Die";
     float timer = 0;
     IEnumerator Death()
     {
-        state = mov.die;
-        mov.state = state;
+        //update state
+        mov.state = mov.die;
+
+        //stop enemy
         body.velocity = new Vector2(0, 0);
         anime.enabled = false;
+
+        //change material and set original color
         for (int i = 0; i < renderers.Length; i++)
         {
             renderers[i].material = deathMaterial;
             renderers[i].material.color = normalColors[i];
         }
 
-            yield return new WaitForSeconds(deathTime);
+        //wait for animation
+        yield return new WaitForSeconds(deathTime);
 
+        //create death particle
+        GameObject particle = Instantiate(deathParticlePrehub);
+        particle.transform.position = this.transform.position;
+
+        //destroy
         Destroy(this.gameObject);
     }
 
     void ExecuteDieAnim()
     {
-        for(int i = 0; i < renderers.Length; i++)
+        for (int i = 0; i < renderers.Length; i++)
             renderers[i].material.color = new Color(
-                normalColors[i].r * ((deathTime - timer) / deathTime),
-                normalColors[i].g * ((deathTime - timer) / deathTime),
-                normalColors[i].b * ((deathTime - timer) / deathTime));
+                normalColors[i].r * ((uncolorTime - timer) / uncolorTime),
+                normalColors[i].g * ((uncolorTime - timer) / uncolorTime),
+                normalColors[i].b * ((uncolorTime - timer) / uncolorTime));
             
         timer += Time.deltaTime;
     }
