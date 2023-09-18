@@ -17,7 +17,7 @@ public class CheckInput : MonoBehaviour
     [SerializeField] private string downKey;
     [SerializeField] private string airMagicKey;
     [SerializeField] private string healKey;
-    [SerializeField] private string dashKey;
+    [SerializeField] private string crouchKey;
     [SerializeField] private string basicAttackKey;
 
 
@@ -28,7 +28,7 @@ public class CheckInput : MonoBehaviour
     [HideInInspector] public KeyData left;
     [HideInInspector] public KeyData airMagic;
     [HideInInspector] public KeyData heal;
-    [HideInInspector] public KeyData dash;
+    [HideInInspector] public KeyData crouch;
     [HideInInspector] public KeyData basicAttack;
     
     [HideInInspector] public KeyData attack;
@@ -56,7 +56,7 @@ public class CheckInput : MonoBehaviour
         left = new KeyData();
         airMagic = new KeyData();
         heal = new KeyData();
-        dash = new KeyData();
+        crouch = new KeyData();
         basicAttack = new KeyData();
 
         buttons = new KeyData[buttonNumber];
@@ -71,7 +71,7 @@ public class CheckInput : MonoBehaviour
         keys[3] = up;
         keys[4] = airMagic;
         keys[5] = heal;
-        keys[6] = dash;
+        keys[6] = crouch;
         keys[7] = basicAttack;
 
         buttons[0] = attack;
@@ -101,7 +101,7 @@ public class CheckInput : MonoBehaviour
         left.code = leftKey;
         airMagic.code = airMagicKey;
         heal.code = healKey;
-        dash.code = dashKey;
+        crouch.code = crouchKey;
         basicAttack.code = basicAttackKey;
     }
 

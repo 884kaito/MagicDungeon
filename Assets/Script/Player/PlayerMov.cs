@@ -112,6 +112,11 @@ public class PlayerMov : MonoBehaviour
             return;
         }
 
+        Crouch();
+
+        if (data.state == data.crouch)
+            return;
+
         xSpeedNow = body.velocity.x;
         ySpeedNow = body.velocity.y;
         
@@ -272,12 +277,32 @@ public class PlayerMov : MonoBehaviour
         fallTime = 0f;
     }
 
+
+
+    #endregion
+    
+
+
+    void Crouch()
+    {
+        if(input.crouch.on && isGround)
+        {
+            data.state = data.crouch;
+            StopPlayer();
+        }
+        else
+        {
+            if (data.state == data.crouch)
+                data.state = data.idle;
+        }
+    }
+
+
+
     public void StopPlayer()
     {
         body.velocity = new Vector2(0, 0);
     }
-
-    #endregion
 
     #endregion
 

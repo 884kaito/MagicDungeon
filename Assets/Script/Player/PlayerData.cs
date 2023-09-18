@@ -31,7 +31,8 @@ public class PlayerData : MonoBehaviour
         Fall,
         AirMagic,
         Hit,
-        Die
+        Die,
+        Crouch
     };
     [HideInInspector] public State state = State.Idle;
     [HideInInspector] public State idle = State.Idle;
@@ -41,6 +42,7 @@ public class PlayerData : MonoBehaviour
     [HideInInspector] public State airMagic = State.AirMagic;
     [HideInInspector] public State hit = State.Hit;
     [HideInInspector] public State die = State.Die;
+    [HideInInspector] public State crouch = State.Crouch;
 
     //hp & mp
     [HideInInspector] public float hp;

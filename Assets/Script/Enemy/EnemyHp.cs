@@ -71,7 +71,7 @@ public class EnemyHp : MonoBehaviour
     void Hit(AttackData.Data data)
     {
         if(mov.state != mov.die)
-            CreateDamageText(data.damage);
+            StartCoroutine(CreateDamageText(data.damage));
 
         if (MinusHp(data.damage))
         {
@@ -112,7 +112,7 @@ public class EnemyHp : MonoBehaviour
     }
 
 
-    void CreateDamageText(float damage)
+    IEnumerator CreateDamageText(float damage)
     {
         //create
         GameObject canvas = Instantiate(damageTextCanvas);
@@ -126,6 +126,10 @@ public class EnemyHp : MonoBehaviour
         damageText.transform.position += rand;
         damageText.transform.position += damageTextOffset;
         damageText.transform.position += this.transform.position;
+
+        //because sometimes text didnt changed
+        yield return new WaitForEndOfFrame();
+        damageText.text = damage.ToString();
     }
 
 

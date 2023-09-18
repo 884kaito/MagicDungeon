@@ -42,11 +42,13 @@ public class PlayerAnime : MonoBehaviour
     readonly string fall = "Fall";
     readonly string land = "Land";
     readonly string hit = "Hit";
+    readonly string crouch = "Crouch";
 
     //animation variables
     readonly string jumpFallTime = "jumpFallTime";
     readonly string isRun = "isRun";
     readonly string isGround = "isGround";
+
 
     void Animate()
     {
@@ -64,36 +66,47 @@ public class PlayerAnime : MonoBehaviour
         else
             body.transform.localScale = new Vector3(-playerScale.x, playerScale.y, playerScale.z);
 
+        //reset all triggers
+        ResetTriggers();
+
         //idle
-        if ((state == data.idle) 
-            && (animeInfo.clip.name != idle && animeInfo.clip.name != fall && animeInfo.clip.name != land))
-            anime.Play(idle);
+        if (state == data.idle)
+            anime.SetTrigger(idle);
 
         //run
-        if (state == data.run && (animeInfo.clip.name != run && animeInfo.clip.name != fall && animeInfo.clip.name != land))
-            anime.Play(run);
+        else if (state == data.run)
+            anime.SetTrigger(run);
 
-        //jump&fall&land
-        if (state == data.jump)
+        //jump fall
+        else if (state == data.jump)
         {
             anime.SetFloat(jumpFallTime, (mov.jumpTime / mov.maxJumpTime));
-            if (animeInfo.clip.name != jump)
-                anime.Play(jump);
-
+            anime.SetTrigger(jump);
         }
-        if(state == data.fall)
+        else if (state == data.fall)
         {
             anime.SetFloat(jumpFallTime, (mov.fallTime / mov.maxJumpTime));
-            if (animeInfo.clip.name != fall)
-                anime.Play(fall);
+            anime.SetTrigger(fall);
         }
 
         //hit
-        if (state == data.hit && animeInfo.clip.name != hit)
+        else if (state == data.hit && animeInfo.clip.name != hit)
             anime.Play(hit);
 
+        //crouch
+        else if (state == data.crouch || state == data.airMagic)
+            anime.SetTrigger(crouch);
+
+    }
 
 
+    void ResetTriggers()
+    {
+        anime.ResetTrigger(idle);
+        anime.ResetTrigger(run);
+        anime.ResetTrigger(jump);
+        anime.ResetTrigger(fall);
+        anime.ResetTrigger(crouch);
     }
 
     #endregion
