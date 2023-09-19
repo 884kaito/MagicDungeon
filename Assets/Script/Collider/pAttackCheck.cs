@@ -74,6 +74,10 @@ public class pAttackCheck : MonoBehaviour
         if (collision.CompareTag(checkTag))
         {
             isStay = true;
+            if (collision.GetComponent<AttackData>())
+                hitData = collision.GetComponent<AttackData>().data;
+            else
+                Debug.LogError("Hit object dont have AttackData script");
         }
     }
 
@@ -82,6 +86,11 @@ public class pAttackCheck : MonoBehaviour
         if (collision.CompareTag(checkTag))
         {
             isExit = true;
+            if (collision.GetComponent<AttackData>())
+                hitData = collision.GetComponent<AttackData>().data;
+            else
+                Debug.LogError("Hit object dont have AttackData script");
+
         }
     }
 }

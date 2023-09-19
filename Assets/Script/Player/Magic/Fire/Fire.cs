@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Fire : MonoBehaviour
+public class Fire : AttackData
 {
+
     public float speed;
     public float scale;
     public float range;
@@ -11,11 +12,26 @@ public class Fire : MonoBehaviour
     private float timer;
     private float maxTime;
 
+    CapsuleCollider col;
 
 
-    void Awake()
+
+    void Start()
     {
         maxTime = range / speed;
+        data.damage = damage;
+        StartCoroutine(LateStart());
+    }
+
+    IEnumerator LateStart()
+    {
+        col = GetComponent<CapsuleCollider>();
+        col.enabled = false;
+
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+
+        col.enabled = true;
     }
 
 

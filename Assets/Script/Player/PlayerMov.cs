@@ -25,6 +25,11 @@ public class PlayerMov : MonoBehaviour
     [Header("AirMagic")]
     [SerializeField] private float airMagicDesalloc; //air Magic deallocation
     [SerializeField] private float airMagicMp;
+
+    [Header("Heal")]
+    [SerializeField] private float healSpeed;
+    [SerializeField] private float healStartTime;
+    [SerializeField] private float shpUseSpeed;
     #endregion
 
 
@@ -79,6 +84,8 @@ public class PlayerMov : MonoBehaviour
         SetVelocity();
 
         AirMagic();
+
+        Heal();
     }
 
 
@@ -106,7 +113,7 @@ public class PlayerMov : MonoBehaviour
     float ySpeedNow;
     private void SetVelocity()
     {
-        if (data.state == data.airMagic)
+        if (data.state == data.airMagic || data.state == data.heal)
         {
             StopPlayer();
             return;
@@ -366,6 +373,53 @@ public class PlayerMov : MonoBehaviour
         if (input.airMagic.down)
             data.state = data.fall;
         ResetYData();
+    }
+
+    #endregion
+
+
+
+
+    #region
+    float chargeTimer = 0f;
+
+    void Heal()
+    {
+
+        if(input.heal.down && isGround && data.state != data.heal && data.CanHpHeal())
+        {
+            StartCharge();
+        }
+
+        if (data.state == data.heal && chargeTimer > healStartTime)
+            if(!data.HpHeal(healSpeed, shpUseSpeed)) //heal and verify if can continue healing
+                StopHeal();
+
+
+        if (data.state == data.heal && !input.heal.on)
+        {
+            StopHeal();
+        }
+
+        chargeTimer += Time.deltaTime;
+    }
+
+
+    void StartCharge()
+    {
+        //start heal state
+        data.state = data.heal;
+        chargeTimer = 0;
+        StopPlayer();
+    }
+
+    void StopHeal()
+    {
+        //update state
+        data.state = data.idle;
+
+        //stop heal
+        data.StopHeal();
     }
 
     #endregion

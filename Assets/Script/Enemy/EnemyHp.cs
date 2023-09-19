@@ -12,10 +12,12 @@ public class EnemyHp : MonoBehaviour
     [SerializeField] pAttackCheck pAttack;
 
     [Header("Death")]
+    [SerializeField] float money;
     [SerializeField] float deathTime;
     [SerializeField] float uncolorTime;
     [SerializeField] Material deathMaterial;
     [SerializeField] GameObject deathParticlePrehub;
+    [SerializeField] GameObject corePrehub;
 
     [Header("Damage Text")]
     [SerializeField] GameObject damageTextCanvas;
@@ -137,6 +139,29 @@ public class EnemyHp : MonoBehaviour
     float timer = 0;
     IEnumerator Death()
     {
+        StartDeath();
+
+        //wait for animation
+        yield return new WaitForSeconds(deathTime);
+
+        //create death particle
+        GameObject particle = Instantiate(deathParticlePrehub);
+        particle.transform.position = this.transform.position;
+
+        //drop core
+        GameObject core = Instantiate(corePrehub);
+        core.transform.position = this.transform.position;
+
+        //increase money
+        GameManager.inst.money += money;
+
+        //destroy
+        Destroy(this.gameObject);
+    }
+
+
+    void StartDeath()
+    {
         //update state
         mov.state = mov.die;
 
@@ -153,16 +178,6 @@ public class EnemyHp : MonoBehaviour
             renderers[i].material = deathMaterial;
             renderers[i].material.color = normalColors[i];
         }
-
-        //wait for animation
-        yield return new WaitForSeconds(deathTime);
-
-        //create death particle
-        GameObject particle = Instantiate(deathParticlePrehub);
-        particle.transform.position = this.transform.position;
-
-        //destroy
-        Destroy(this.gameObject);
     }
 
     void ExecuteDieAnim()
@@ -172,7 +187,7 @@ public class EnemyHp : MonoBehaviour
                 normalColors[i].r * ((uncolorTime - timer) / uncolorTime),
                 normalColors[i].g * ((uncolorTime - timer) / uncolorTime),
                 normalColors[i].b * ((uncolorTime - timer) / uncolorTime));
-            
+        
         timer += Time.deltaTime;
     }
 

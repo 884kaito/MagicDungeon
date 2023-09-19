@@ -32,7 +32,6 @@ public class FireMagic : MonoBehaviour
 
         //create
         GameObject fire = Instantiate(firePrehub);
-        fire.SetActive(true);
 
         //position & rotation
         fire.transform.position = transform.position;
@@ -46,8 +45,5 @@ public class FireMagic : MonoBehaviour
         velocity.y = Mathf.Sin(mData.degree);
         velocity = velocity.normalized * fireSc.speed;
         body.velocity = velocity;
-
-        //active
-        fire.SetActive(true);
     }
 }

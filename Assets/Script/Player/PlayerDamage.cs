@@ -9,13 +9,20 @@ public class PlayerDamage : MonoBehaviour
     [SerializeField] float hitAnimeAngle;
     [SerializeField] float hitAnimeSpeed;
 
+    [SerializeField] private float hitStopTime;
+    [SerializeField] private float shakeWight;
+
 
     [SerializeField] eAttackCheck hitArea;
+
+    
+
     PlayerData data;
     Renderer[] renderers;
     Rigidbody body;
 
-    bool isInvencible = false;
+    CameraController cameraSc;
+
     private Vector2 hitAnimeVelocity;
 
 
@@ -27,6 +34,7 @@ public class PlayerDamage : MonoBehaviour
         data = FindObjectOfType<PlayerData>();
         renderers = GetComponentsInChildren<Renderer>();
         body = GetComponent<Rigidbody>();
+        cameraSc = FindObjectOfType<CameraController>();
 
         //calculate hit animation velocity
         hitAnimeVelocity = HitAnimeVelocity();
@@ -66,6 +74,12 @@ public class PlayerDamage : MonoBehaviour
         {
             StartCoroutine(Hit());
         }
+        else
+        {
+            //change to death animation
+            data.hp = 0;
+            Destroy(this.gameObject);
+        }
 
     }
 
@@ -77,6 +91,10 @@ public class PlayerDamage : MonoBehaviour
 
         //blink
         StartCoroutine(Blink());
+
+        //hit stop effect
+        cameraSc.StartShake(shakeWight, hitStopTime);
+        StartCoroutine(GameManager.inst.StopForSeconds(hitStopTime));
 
         //set velocity
         if (data.isRight)

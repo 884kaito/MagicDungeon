@@ -43,6 +43,7 @@ public class PlayerAnime : MonoBehaviour
     readonly string land = "Land";
     readonly string hit = "Hit";
     readonly string crouch = "Crouch";
+    readonly string heal = "Heal";
 
     //animation variables
     readonly string jumpFallTime = "jumpFallTime";
@@ -97,6 +98,9 @@ public class PlayerAnime : MonoBehaviour
         else if (state == data.crouch || state == data.airMagic)
             anime.SetTrigger(crouch);
 
+        //heal
+        else if (state == data.heal)
+            anime.SetTrigger(heal);
     }
 
 
@@ -107,6 +111,7 @@ public class PlayerAnime : MonoBehaviour
         anime.ResetTrigger(jump);
         anime.ResetTrigger(fall);
         anime.ResetTrigger(crouch);
+        anime.ResetTrigger(heal);
     }
 
     #endregion

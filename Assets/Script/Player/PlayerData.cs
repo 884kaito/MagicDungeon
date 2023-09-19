@@ -32,7 +32,8 @@ public class PlayerData : MonoBehaviour
         AirMagic,
         Hit,
         Die,
-        Crouch
+        Crouch,
+        Heal
     };
     [HideInInspector] public State state = State.Idle;
     [HideInInspector] public State idle = State.Idle;
@@ -43,6 +44,7 @@ public class PlayerData : MonoBehaviour
     [HideInInspector] public State hit = State.Hit;
     [HideInInspector] public State die = State.Die;
     [HideInInspector] public State crouch = State.Crouch;
+    [HideInInspector] public State heal = State.Heal;
 
     //hp & mp
     [HideInInspector] public float hp;
@@ -52,8 +54,10 @@ public class PlayerData : MonoBehaviour
 
 
     #region //private
-    
+
     private float mpHealTimer;
+    private float hpHealSpeed;
+    private bool isHeal = false;
 
     #endregion
 
@@ -110,5 +114,30 @@ public class PlayerData : MonoBehaviour
         return true;
     }
 
+   public bool HpHeal(float hpHealSpeed, float shpUseSpeed)
+    {
+        if (CanHpHeal())
+        {
+            hp += Time.deltaTime * maxHp * hpHealSpeed;
+            shp -= Time.deltaTime * shpUseSpeed;
+            return true;
+        }
+        return false;
+    }
+
+    public bool CanHpHeal()
+    {
+        return shp > 0 && hp < maxHp;
+    }
+
+    public void StopHeal()
+    {
+        isHeal = false;
+    }
+
+    public void ShpHeal(float heal)
+    {
+        shp = Mathf.Clamp(shp + heal, 0, maxShp);
+    }
     #endregion
 }
