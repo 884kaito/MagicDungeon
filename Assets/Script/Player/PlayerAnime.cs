@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//manage player animation
 public class PlayerAnime : MonoBehaviour
 {
     //editable in other scripts
@@ -13,6 +14,7 @@ public class PlayerAnime : MonoBehaviour
     private PlayerData data;
     private Rigidbody body;
 
+    //private components
     private Vector3 playerScale;
 
     void Start()
@@ -20,7 +22,7 @@ public class PlayerAnime : MonoBehaviour
         mov = GetComponent<PlayerMov>();
         data = GetComponent<PlayerData>();
         body = GetComponent<Rigidbody>();
-        playerScale = this.transform.localScale;
+        playerScale = this.transform.localScale; //set player default scale
     }
 
     void Update()
@@ -40,12 +42,11 @@ public class PlayerAnime : MonoBehaviour
     readonly string run = "Run";
     readonly string jump = "Jump";
     readonly string fall = "Fall";
-    readonly string land = "Land";
     readonly string hit = "Hit";
     readonly string crouch = "Crouch";
     readonly string heal = "Heal";
 
-    //animation variables
+    //animation parameters
     readonly string jumpFallTime = "jumpFallTime";
     readonly string isRun = "isRun";
     readonly string isGround = "isGround";
@@ -67,6 +68,10 @@ public class PlayerAnime : MonoBehaviour
         else
             body.transform.localScale = new Vector3(-playerScale.x, playerScale.y, playerScale.z);
 
+
+
+        //link player state with animation
+
         //reset all triggers
         ResetTriggers();
 
@@ -78,12 +83,13 @@ public class PlayerAnime : MonoBehaviour
         else if (state == data.run)
             anime.SetTrigger(run);
 
-        //jump fall
+        //jump
         else if (state == data.jump)
         {
             anime.SetFloat(jumpFallTime, (mov.jumpTime / mov.maxJumpTime));
             anime.SetTrigger(jump);
         }
+        //fall
         else if (state == data.fall)
         {
             anime.SetFloat(jumpFallTime, (mov.fallTime / mov.maxJumpTime));

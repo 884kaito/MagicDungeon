@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//move damage text and destroy
 public class DamageText : MonoBehaviour
 {
     [SerializeField] float time;
@@ -9,21 +10,18 @@ public class DamageText : MonoBehaviour
 
     private float timer = 0f;
 
-    void Start()
-    {
-
-    }
-
 
     void Update()
     {
+        //up text
         transform.position += new Vector3(0, speed * Time.deltaTime, 0);
 
-        if(timer >= time)
+        timer += Time.deltaTime;
+
+        //destroy after few time
+        if (timer >= time)
         {
             Destroy(this.gameObject);
         }
-
-        timer += Time.deltaTime;
     }
 }

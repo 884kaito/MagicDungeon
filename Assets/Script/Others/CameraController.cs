@@ -3,26 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 
+//control camera
 public class CameraController : MonoBehaviour
 {
-    private bool isShake = false;
     private float shakeDuration;
 
     CinemachineBasicMultiChannelPerlin noise;
-    CinemachineBrain brain;
 
 
     private void Start()
     {
         noise = GetComponentInChildren<CinemachineVirtualCamera>().GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
-        brain = GetComponentInChildren<CinemachineBrain>();
-
     }
 
 
     public void StartShake(float width, float duration)
     {
-        isShake = true;
+        //set parameters
         shakeDuration = duration;
         noise.m_AmplitudeGain = width;
 
@@ -36,23 +33,7 @@ public class CameraController : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(shakeDuration);
 
-        isShake = false;
+        //stop shake
         noise.m_AmplitudeGain = 0;
-    }
-
-    private void Update()
-    {
-        if (GameManager.inst.timeScale == 0)
-        {
-            brain.ManualUpdate();
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (GameManager.inst.timeScale != 0)
-        {
-            brain.ManualUpdate();
-        }
     }
 }

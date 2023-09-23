@@ -2,27 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//manage player damage
 public class PlayerDamage : MonoBehaviour
 {
+    //editable in inspector
+    [Header("Hit Parameters")]
     [SerializeField] float hitTime;
     [SerializeField] float invincibleTime;
     [SerializeField] float hitAnimeAngle;
     [SerializeField] float hitAnimeSpeed;
-
-    [SerializeField] private float hitStopTime;
-    [SerializeField] private float shakeWight;
-
-
-    [SerializeField] eAttackCheck hitArea;
+    [SerializeField] float hitStopTime;
+    [SerializeField] float shakeWight;
+    [SerializeField] AttackCheck hitArea;
 
     
-
+    //player component
     PlayerData data;
     Renderer[] renderers;
     Rigidbody body;
 
+    //extern component
     CameraController cameraSc;
 
+    //private 
     private Vector2 hitAnimeVelocity;
 
 
@@ -31,6 +33,7 @@ public class PlayerDamage : MonoBehaviour
 
     void Start()
     {
+        //get component
         data = FindObjectOfType<PlayerData>();
         renderers = GetComponentsInChildren<Renderer>();
         body = GetComponent<Rigidbody>();
@@ -40,6 +43,7 @@ public class PlayerDamage : MonoBehaviour
         hitAnimeVelocity = HitAnimeVelocity();
     }
 
+    //calculate velocity after hit
     Vector2 HitAnimeVelocity()
     {
         Vector2 velocity = new Vector2();
@@ -51,9 +55,9 @@ public class PlayerDamage : MonoBehaviour
         return velocity;
     }
 
-
     void FixedUpdate()
     {
+        //execute damage
         if(hitArea.IsHit() && data.canHit)
         {
             Damage(hitArea.hitData);
@@ -67,16 +71,19 @@ public class PlayerDamage : MonoBehaviour
 
     void Damage(AttackData.Data hit)
     {
+        //set states
         data.canHit = false;
         data.canControl = false;
 
+        //hit
         if(data.MinusHp(hit.damage))
         {
             StartCoroutine(Hit());
         }
+        //death
         else
         {
-            //change to death animation
+            ///change to death animation
             data.hp = 0;
             Destroy(this.gameObject);
         }
@@ -102,16 +109,20 @@ public class PlayerDamage : MonoBehaviour
         else
             body.velocity = new Vector2(-hitAnimeVelocity.x, hitAnimeVelocity.y);
 
+
         //wait hit
         yield return new WaitForSeconds(hitTime);
 
-        //end hit
+
+        //end hit move and player can move
         data.state = data.fall;
         body.velocity = new Vector2(0, 0);
         data.canControl = true;
 
+
         //wait invencible time
         yield return new WaitForSeconds(invincibleTime - hitTime);
+
 
         //end invencible time
         data.canHit = true;
@@ -123,6 +134,7 @@ public class PlayerDamage : MonoBehaviour
 
     IEnumerator Blink()
     {
+        //execute blink when invencible
         while (!data.canHit)
         {
             AppearRenderer(true);
@@ -133,6 +145,7 @@ public class PlayerDamage : MonoBehaviour
         AppearRenderer(true);
     }
 
+    //if isAppear true, erase player
     void AppearRenderer(bool isAppear)
     {
         foreach (Renderer renderer in renderers)

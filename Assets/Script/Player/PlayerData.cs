@@ -24,6 +24,7 @@ public class PlayerData : MonoBehaviour
     [HideInInspector] public bool canHit = true;
     [HideInInspector] public bool canControl = true;
 
+    //player possible states
     public enum State {
         Idle,
         Run,
@@ -36,6 +37,7 @@ public class PlayerData : MonoBehaviour
         Heal
     };
     [HideInInspector] public State state = State.Idle;
+    //variables to abbreviate
     [HideInInspector] public State idle = State.Idle;
     [HideInInspector] public State run = State.Run;
     [HideInInspector] public State jump = State.Jump;
@@ -56,22 +58,21 @@ public class PlayerData : MonoBehaviour
     #region //private
 
     private float mpHealTimer;
-    private float hpHealSpeed;
-    private bool isHeal = false;
 
     #endregion
 
 
 
 
-    void Start()
-    {
 
-    }
+
+
     private void Update()
     {
         MpHeal();
     }
+
+
 
 
 
@@ -83,16 +84,20 @@ public class PlayerData : MonoBehaviour
         //if not have mp enough, cant use mp
         if (mp - useMp < 0)
             return false;
-
+        
+        //use mp
         mp -= useMp;
-        mpHealTimer = 0;
+        mpHealTimer = 0; //reset timer for heal
 
         return true;
     }
 
     void MpHeal()
     {
+        //increase timer
         mpHealTimer += Time.deltaTime;
+        
+        //heal
         if (mpHealTimer >= mpHealCooldown && mp < maxMp)
             mp += Time.deltaTime * maxMp * mpHealSpeed; 
     }
@@ -110,29 +115,28 @@ public class PlayerData : MonoBehaviour
         if (hp - damage <= 0)
             return false;
 
+        //minus hp
         hp -= damage;
+
         return true;
     }
 
    public bool HpHeal(float hpHealSpeed, float shpUseSpeed)
     {
+        //heal hp and use shp
         if (CanHpHeal())
         {
             hp += Time.deltaTime * maxHp * hpHealSpeed;
             shp -= Time.deltaTime * shpUseSpeed;
             return true;
         }
+
         return false;
     }
 
     public bool CanHpHeal()
     {
         return shp > 0 && hp < maxHp;
-    }
-
-    public void StopHeal()
-    {
-        isHeal = false;
     }
 
     public void ShpHeal(float heal)

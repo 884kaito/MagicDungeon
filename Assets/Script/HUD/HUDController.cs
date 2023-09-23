@@ -4,13 +4,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+//control all HUD
 public class HUDController : MonoBehaviour
 {
-    [SerializeField] private TMP_Text moneyText;
     [SerializeField] private Slider hpBar;
     [SerializeField] private Slider shpBar;
     [SerializeField] private Slider mpBar;
     private PlayerData data;
+
+
+
+
 
     void Start()
     {
@@ -31,18 +35,19 @@ public class HUDController : MonoBehaviour
     void Update()
     {
         UpdateBarValue();
-
-        moneyText.text = GameManager.inst.money.ToString();
     }
 
-    public void UpdateBarMax()
+
+
+
+    private void UpdateBarMax()
     {
         hpBar.maxValue = data.maxHp;
         mpBar.maxValue = data.maxMp;
         shpBar.maxValue = data.maxShp;
     }
 
-    public void MaximizeBar()
+    private void MaximizeBar()
     {
         data.hp = data.maxHp;
         data.mp = data.maxMp;
@@ -50,7 +55,7 @@ public class HUDController : MonoBehaviour
         UpdateBarValue();
     }
 
-    public void UpdateBarValue()
+    private void UpdateBarValue()
     {
         hpBar.value = data.hp;
         mpBar.value = data.mp;

@@ -2,26 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FireMagic : MonoBehaviour
+//manage fire magic circle
+//criate fire magic
+public class FireMagic : MagicCircleData
 {
     [SerializeField] GameObject firePrehub;
 
-    private MagicCircleData mData;
-    private PlayerData pData;
-
     void Awake()
     {
-        mData = GetComponent<MagicCircleData>();
-        pData = FindAnyObjectByType<PlayerData>();
-
-        mData.StartAppear();
+        StartCoroutine(DeathTimer());
     }
 
 
     private bool isShoted = false;
     private void FixedUpdate()
     {
-        if (mData.isMiddle && !isShoted)
+        //create magic on middle
+        if (isMiddle && !isShoted)
             CreateFire();
     }
 
@@ -35,15 +32,12 @@ public class FireMagic : MonoBehaviour
 
         //position & rotation
         fire.transform.position = transform.position;
-        fire.transform.eulerAngles = new Vector3(fire.transform.eulerAngles.x, fire.transform.eulerAngles.y, this.transform.eulerAngles.x);
+        fire.transform.rotation = transform.rotation;
 
         //velocity
         Rigidbody body = fire.GetComponent<Rigidbody>();
         Fire fireSc = fire.GetComponent<Fire>();
-        Vector3 velocity = new Vector3();
-        velocity.x = -Mathf.Cos(mData.degree);
-        velocity.y = Mathf.Sin(mData.degree);
-        velocity = velocity.normalized * fireSc.speed;
-        body.velocity = velocity;
+        Vector3 velocity = new Vector3(Mathf.Cos(transform.eulerAngles.z * Mathf.Deg2Rad), Mathf.Sin(transform.eulerAngles.z * Mathf.Deg2Rad), 0);
+        body.velocity = velocity.normalized * fireSc.speed;
     }
 }

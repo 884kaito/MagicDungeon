@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//manage player movement
 public class PlayerMov : MonoBehaviour
 {
     ///////////////
@@ -155,25 +156,19 @@ public class PlayerMov : MonoBehaviour
     {
         data.state = data.idle;
 
-        bool isBothKeyOn = input.left.on && input.right.on;
-        if (isBothKeyOn)
-            xSpeedNow = 0.0f;
+        float speed = 0;
+        if (input.left.on) speed--;
+        if (input.right.on) speed++;
 
-        else if (input.right.on)
-        {
-            data.isRight = true;
-            xSpeedNow = groundSpeed;
-            data.state = data.run;
-        }
+        xSpeedNow = groundSpeed * speed; //set speed
 
-        else if (input.left.on)
+        //set states
+        if(speed != 0)
         {
-            data.isRight = false;
-            xSpeedNow = -groundSpeed;
             data.state = data.run;
+            if(speed > 0) data.isRight = true;
+            else data.isRight = false;
         }
-        else
-            xSpeedNow = 0.0f;
 
         return xSpeedNow;
     }
@@ -264,10 +259,13 @@ public class PlayerMov : MonoBehaviour
         //execute fall
         if (data.state == data.fall)
         {
+            //stop fall
             if (isGround)
             {
                 data.state = data.idle;
             }
+
+            //execute jump
             else
             {
                 fallTime += Time.deltaTime;
@@ -292,11 +290,14 @@ public class PlayerMov : MonoBehaviour
 
     void Crouch()
     {
+        //start crouch
         if(input.crouch.on && isGround)
         {
             data.state = data.crouch;
             StopPlayer();
         }
+
+        //stop crouch
         else
         {
             if (data.state == data.crouch)
@@ -321,12 +322,14 @@ public class PlayerMov : MonoBehaviour
 
     void AirMagic()
     {
+        //start air magic and stay
         if (input.airMagic.down && !isGround && data.state != data.airMagic)
         {
             StartAirMagic();
             return;
         }
 
+        //start air magic and jump
         if (input.up.down && !isGround && data.state != data.airMagic)
         {
             if(StartAirMagic())
@@ -334,32 +337,41 @@ public class PlayerMov : MonoBehaviour
             return;
         }
 
+        //stop air magic
         if (data.state == data.airMagic && (input.airMagic.down || input.up.down))
         {
             StopAirMagic();
         }
 
-            
+        //turn
+        if (data.state == data.airMagic)
+        {
+            if (input.right.on) data.isRight = true;
+            else if (input.left.on) data.isRight = false;
+        }
     }
 
     bool StartAirMagic()
     {
+        //view if have mana enough
         bool canShoot = data.UseMp(airMagicMp);
         if (!canShoot) return false;
 
+        //set states
         data.state = data.airMagic;
         StopPlayer();
 
+        //create air magic circle
         GameObject airMagic = Instantiate(airMagicPrehub);
         airMagic.transform.position = this.transform.position;
         airMagic.transform.position += new Vector3(0, -airMagicDesalloc, 0);
-        airMagic.SetActive(true);
 
         return true;
     }
 
     void StopAirMagic()
     {
+        //stop air magic and jump
         if (input.up.down)
         {
             data.state = data.jump;
@@ -369,9 +381,12 @@ public class PlayerMov : MonoBehaviour
             if (input.right.on) direction += 1;
             if (input.left.on) direction -= 1;
             body.velocity = new Vector2(direction * maxXAirSpeed, body.velocity.y);
-        }   
+        }
+
+        //stop air magic and fall
         if (input.airMagic.down)
             data.state = data.fall;
+
         ResetYData();
     }
 
@@ -385,17 +400,18 @@ public class PlayerMov : MonoBehaviour
 
     void Heal()
     {
-
+        //start heal charging
         if(input.heal.down && isGround && data.state != data.heal && data.CanHpHeal())
         {
             StartCharge();
         }
 
+        //execute heal
         if (data.state == data.heal && chargeTimer > healStartTime)
             if(!data.HpHeal(healSpeed, shpUseSpeed)) //heal and verify if can continue healing
                 StopHeal();
 
-
+        //stop heal
         if (data.state == data.heal && !input.heal.on)
         {
             StopHeal();
@@ -417,9 +433,6 @@ public class PlayerMov : MonoBehaviour
     {
         //update state
         data.state = data.idle;
-
-        //stop heal
-        data.StopHeal();
     }
 
     #endregion

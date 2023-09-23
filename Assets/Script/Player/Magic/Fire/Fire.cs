@@ -2,15 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//control fire magic
 public class Fire : AttackData
 {
-
     public float speed;
     public float scale;
     public float range;
 
-    private float timer;
-    private float maxTime;
+    float timer;
+    float maxTime;
 
     CapsuleCollider col;
 
@@ -19,10 +19,12 @@ public class Fire : AttackData
     void Start()
     {
         maxTime = range / speed;
-        data.damage = damage;
+        SetData();
+
         StartCoroutine(LateStart());
     }
 
+    //enable collider 2 frames after to have time to set damage
     IEnumerator LateStart()
     {
         col = GetComponent<CapsuleCollider>();
@@ -67,6 +69,7 @@ public class Fire : AttackData
         if (timer >= maxTime)
             DestroyMagic();
 
+        //count time
         timer += Time.deltaTime;
     }
 

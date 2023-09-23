@@ -4,12 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+//manage enemy hp and damage
 public class EnemyHp : MonoBehaviour
 {
     [Header("Hit")]
     [SerializeField] float maxHp;
     [SerializeField] Collider hitArea;
-    [SerializeField] pAttackCheck pAttack;
+    [SerializeField] AttackCheck pAttack;
 
     [Header("Death")]
     [SerializeField] float money;
@@ -25,7 +26,7 @@ public class EnemyHp : MonoBehaviour
     [SerializeField] Vector3 damageTextRand;
 
 
-    NEnemyMov mov;
+    EnemyState state;
     Animator anime;
     Rigidbody body;
     Renderer[] renderers;
@@ -39,7 +40,7 @@ public class EnemyHp : MonoBehaviour
 
     void Start()
     {
-        mov = GetComponent<NEnemyMov>();
+        state = GetComponent<EnemyState>();
         anime = GetComponentInChildren<Animator>();
         renderers = GetComponentsInChildren<Renderer>();
         body = GetComponent<Rigidbody>();
@@ -55,13 +56,15 @@ public class EnemyHp : MonoBehaviour
 
     void FixedUpdate()
     {
+        //start hit
         if (pAttack.IsEnter())
             Hit(pAttack.hitData);
 
 
         //execute die
-        if(mov.state == mov.die)
+        if(state.state == state.die)
         {
+            //uncolor
             ExecuteDieAnim();
         }
     }
@@ -72,14 +75,17 @@ public class EnemyHp : MonoBehaviour
 
     void Hit(AttackData.Data data)
     {
-        if(mov.state != mov.die)
+        //create damage text
+        if(state.state != state.die)
             StartCoroutine(CreateDamageText(data.damage));
 
+        //hit
         if (MinusHp(data.damage))
         {
-            mov.state = mov.fright;
+            state.state = state.fright;
             StartCoroutine(HitAnime());
         }
+        //death
         else
         {
             StartCoroutine(Death());
@@ -93,22 +99,26 @@ public class EnemyHp : MonoBehaviour
         if (hp - damage <= 0)
             return false;
 
+        //minus hp
         hp -= damage;
+
         return true;
     }
 
 
     IEnumerator HitAnime()
     {
+        //put more dark color
         float colorMult = 0.7f;
-
         for (int i = 0; i < renderers.Length; i++)
             renderers[i].material.color = new Color(normalColors[i].r * colorMult,
                                             normalColors[i].g * colorMult,
                                             normalColors[i].b * colorMult);
 
+        //wait a little
         yield return new WaitForSeconds(0.1f);
 
+        //put back normal color
         for (int i = 0; i < renderers.Length; i++)
             renderers[i].material.color = normalColors[i];
     }
@@ -152,9 +162,6 @@ public class EnemyHp : MonoBehaviour
         GameObject core = Instantiate(corePrehub);
         core.transform.position = this.transform.position;
 
-        //increase money
-        GameManager.inst.money += money;
-
         //destroy
         Destroy(this.gameObject);
     }
@@ -163,7 +170,7 @@ public class EnemyHp : MonoBehaviour
     void StartDeath()
     {
         //update state
-        mov.state = mov.die;
+        state.state = state.die;
 
         //disable hit collider
         hitArea.enabled = false;
@@ -182,6 +189,7 @@ public class EnemyHp : MonoBehaviour
 
     void ExecuteDieAnim()
     {
+        //uncolor
         for (int i = 0; i < renderers.Length; i++)
             renderers[i].material.color = new Color(
                 normalColors[i].r * ((uncolorTime - timer) / uncolorTime),

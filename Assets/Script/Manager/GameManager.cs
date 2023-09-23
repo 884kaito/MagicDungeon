@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//storage and manage datas that envolve all game
 public class GameManager : MonoBehaviour
 {
     //tag names
@@ -10,11 +11,6 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public string enemyTag = "Enemy";
     [HideInInspector] public string pAttackTag = "PlayerAttack";
     [HideInInspector] public string eAttackTag = "EnemyAttack";
-
-
-    //Player Attributes
-    [HideInInspector] public float money;
-
 
     //time
     [HideInInspector] public float timeScale = 1;
@@ -32,7 +28,7 @@ public class GameManager : MonoBehaviour
 
 
 
-
+    //command to erase other gameManeger in scene
     public static GameManager inst = null;
     private void Awake()
     {

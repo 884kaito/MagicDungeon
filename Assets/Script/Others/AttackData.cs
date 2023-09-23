@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//storage attack essencial data
 [System.Serializable]
 public class AttackData : MonoBehaviour
 {
-
     [SerializeField] public float damage;
     public enum Owner
     {
@@ -30,7 +30,12 @@ public class AttackData : MonoBehaviour
 
     private void Start()
     {
+        SetData();
+    }
 
+
+    public void SetData()
+    {
         data.damage = damage;
         data.owner = owner;
     }

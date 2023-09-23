@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Armazena dados de um key
+/// Storage one key data
 /// </summary>
 
 [System.Serializable]
 public class KeyData : MonoBehaviour
 {
+    //variables
     public string code;
     public bool on;
     public bool down;
     public bool before;
 
+    //inicialize variables
     private void Awake()
     {
         code = "";

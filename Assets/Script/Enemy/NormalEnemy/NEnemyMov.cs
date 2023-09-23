@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NEnemyMov : MonoBehaviour
+//do movement and animation
+public class NEnemyMov : EnemyState
 {
     [Header("Movement Parameters")]
     [SerializeField] float xSpeed;
@@ -15,31 +16,15 @@ public class NEnemyMov : MonoBehaviour
 
 
     [Header("Slime Components")]
-    Rigidbody body;
-    PlayerData pData;
-    Animator anime;
     [SerializeField] GroundCheck ground;
     [SerializeField] GroundCheck front;
     [SerializeField] PlayerCheck searchArea;
     [SerializeField] PlayerCheck battleArea;
     [SerializeField] AnimationClip moveAnimation;
-
-
-
-    [HideInInspector] public enum State
-    {
-        Move,
-        Fright,
-        Search,
-        Die
-    }
-    [HideInInspector] public State state = State.Move;
-    [HideInInspector] public State move = State.Move;
-    [HideInInspector] public State fright = State.Fright;
-    [HideInInspector] public State search = State.Search;
-    [HideInInspector] public State die = State.Die;
-
+    Rigidbody body;
+    Animator anime;
     AnimatorClipInfo animeInfo;
+    
 
 
 
@@ -47,7 +32,6 @@ public class NEnemyMov : MonoBehaviour
     void Start()
     {
         body = GetComponent<Rigidbody>();
-        pData = FindObjectOfType<PlayerData>();
         anime = GetComponentInChildren<Animator>();
     }
 
@@ -97,8 +81,10 @@ public class NEnemyMov : MonoBehaviour
         {
             float animationTime = (moveAnimation.length * anime.GetCurrentAnimatorStateInfo(0).normalizedTime) % moveAnimation.length;
 
+            //if jumping, move
             if (animationTime >= exitGroundTime && animationTime <= enterGroundTime)
                 body.velocity = new Vector2(xSpeed, -gravity);
+            //if in ground, stop
             else
                 body.velocity = new Vector2(0, 0);
         }
@@ -137,9 +123,10 @@ public class NEnemyMov : MonoBehaviour
             anime.Play(frightAnim);
         }
 
+        //search
         if(state == State.Search)
         {
-            //search finish, change to move
+            //if search finish, change to move
             if (animeInfo.clip.name == searchAnim && anime.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
             {
                 state = State.Move;
