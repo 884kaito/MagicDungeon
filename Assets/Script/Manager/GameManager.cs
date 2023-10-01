@@ -26,6 +26,12 @@ public class GameManager : MonoBehaviour
         Time.timeScale = timeScale;
     }
 
+    public void setTimeScale(float scale)
+    {
+        timeScale = scale;
+        Time.timeScale = timeScale;
+    }
+
 
 
     //command to erase other gameManeger in scene

@@ -15,17 +15,31 @@ public class PlayerDamage : MonoBehaviour
     [SerializeField] float shakeWight;
     [SerializeField] AttackCheck hitArea;
 
-    
+    [Header("Death Parameters")]
+    [SerializeField] float deathTime;
+    [SerializeField] float uncolorTime;
+    [SerializeField] float deathTimeScale;
+    [SerializeField] GameObject deathParticlePrehub;
+    [SerializeField] GameObject wandPrehub;
+    [SerializeField] Material deathMaterial;
+
+
+
+
+
     //player component
     PlayerData data;
     Renderer[] renderers;
     Rigidbody body;
+    Animator anime;
 
     //extern component
     CameraController cameraSc;
 
     //private 
     private Vector2 hitAnimeVelocity;
+    Color[] normalColors;
+
 
 
 
@@ -37,10 +51,23 @@ public class PlayerDamage : MonoBehaviour
         data = FindObjectOfType<PlayerData>();
         renderers = GetComponentsInChildren<Renderer>();
         body = GetComponent<Rigidbody>();
+        anime = GetComponentInChildren<Animator>();
         cameraSc = FindObjectOfType<CameraController>();
 
         //calculate hit animation velocity
         hitAnimeVelocity = HitAnimeVelocity();
+
+        //get inicial colors
+        normalColors = new Color[renderers.Length];
+        for (int i = 0; i < renderers.Length; i++)
+            normalColors[i] = renderers[i].material.color;
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            renderers[i].material.color = new Color(
+                normalColors[i].r,
+                normalColors[i].g,
+                normalColors[i].b);
+        }
     }
 
     //calculate velocity after hit
@@ -62,7 +89,16 @@ public class PlayerDamage : MonoBehaviour
         {
             Damage(hitArea.hitData);
         }
+
+        //execute die
+        if (data.state == data.die)
+        {
+            //uncolor
+            ExecuteDieAnim();
+        }
     }
+
+
 
 
 
@@ -84,8 +120,7 @@ public class PlayerDamage : MonoBehaviour
         else
         {
             ///change to death animation
-            data.hp = 0;
-            Destroy(this.gameObject);
+            StartCoroutine(Death());
         }
 
     }
@@ -151,4 +186,74 @@ public class PlayerDamage : MonoBehaviour
         foreach (Renderer renderer in renderers)
             renderer.enabled = isAppear;
     }
+
+
+
+
+
+
+
+
+
+    float timer = 0;
+    IEnumerator Death()
+    {
+        StartDeath();
+
+        //wait 2 frames
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+
+        anime.enabled = false;
+
+        //wait for animation
+        yield return new WaitForSeconds(deathTime);
+
+        //create death particle
+        GameObject particle = Instantiate(deathParticlePrehub);
+        particle.transform.position = this.transform.position;
+
+        //drop core
+        GameObject wand = Instantiate(wandPrehub);
+        wand.transform.position += this.transform.position;
+
+        //destroy
+        Destroy(this.gameObject);
+    }
+
+
+    void StartDeath()
+    {
+        //update state
+        data.state = data.die;
+
+        //set hp
+        data.hp = 0;
+
+        //change time scale
+        GameManager.inst.setTimeScale(deathTimeScale);
+
+        //disable hit collider
+        hitArea.enabled = false;
+
+        //stop enemy
+        body.velocity = new Vector2(0, 0);
+
+        //change material and set original color
+        for (int i = 0; i < renderers.Length; i++)
+            renderers[i].material.color = normalColors[i];
+    }
+
+    void ExecuteDieAnim()
+    {
+        //uncolor
+        for (int i = 0; i < renderers.Length; i++)
+            renderers[i].material.color = new Color(
+                normalColors[i].r * ((uncolorTime - timer) / uncolorTime),
+                normalColors[i].g * ((uncolorTime - timer) / uncolorTime),
+                normalColors[i].b * ((uncolorTime - timer) / uncolorTime));
+
+        timer += Time.deltaTime;
+    }
+
 }

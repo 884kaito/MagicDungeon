@@ -13,7 +13,7 @@ public class PlayerAnime : MonoBehaviour
     private PlayerMov mov;
     private PlayerData data;
     private Rigidbody body;
-
+    
     //private components
     private Vector3 playerScale;
 
@@ -97,7 +97,7 @@ public class PlayerAnime : MonoBehaviour
         }
 
         //hit
-        else if (state == data.hit && animeInfo.clip.name != hit)
+        else if ((state == data.hit || state == data.die) && animeInfo.clip.name != hit)
             anime.Play(hit);
 
         //crouch
